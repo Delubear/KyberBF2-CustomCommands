@@ -41,8 +41,12 @@ EventManager.Listen("ServerPlayer:SendMessage", function(player, message)
     EventManager.SetCancelled(true)
 
     if command == "swapteam" or command == "swap" or command == "st" then
-        player:SetTeam((math.fmod(player.team, 2)) + 1)
-        Console.Execute(string.format("Kyber.Broadcast Player %s has swapped to team %d", player.name, player.team))
+        if not player.isSpawned then
+            player:SetTeam((math.fmod(player.team, 2)) + 1)
+            Console.Execute(string.format("Kyber.Broadcast Player %s has swapped to team %d", player.name, player.team))
+        else
+            print(pluginPrefix .. string.format("Player %s attempted to swap teams while alive, but is not allowed to.", player.name))
+        end
     elseif command == "skip" then
         if table.contains(AdminPlayerIds, tostring(player.playerId):lower()) then
             Console.Execute("Kyber.Broadcast Round skipped by admin " .. player.name)
