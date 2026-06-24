@@ -56,10 +56,22 @@ EventManager.Listen("ServerPlayer:SendMessage", function(player, message)
         end
     elseif command == "givepoints" or command == "gp" then
         if table.contains(AdminPlayerIds, tostring(player.playerId):lower()) then
-            local points = tonumber(messageSplit[2]) or 4000
-            if points then
-                Console.Execute(string.format("Kyber.Broadcast Admin %s has added %d points", player.name, points))
-                player:GiveBattlepoints(points)
+            if #messageSplit >= 3 then
+                local targetPlayerName = messageSplit[2]
+                local points = tonumber(messageSplit[3])
+                if points then
+                    targetPlayer = PlayerManager.GetPlayer(targetPlayerName)
+                    targetPlayer:GiveBattlepoints(points)
+                    Console.Execute(string.format("Kyber.Broadcast Admin %s gave %d points to %s", player.name, points, targetPlayerName))
+                else
+                    Console.Execute(string.format("Kyber.Broadcast Invalid points value. Usage: /givepoints playerName points"))
+                end
+            else
+                local points = tonumber(messageSplit[2]) or 4000
+                if points then
+                    Console.Execute(string.format("Kyber.Broadcast Admin %s gave %d points to %s", player.name, points, player.name))
+                    player:GiveBattlepoints(points)
+                end
             end
         else
             print(pluginPrefix .. string.format("Player %s attempted to add points, but is not an admin.", player.name))
